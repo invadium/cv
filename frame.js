@@ -5,6 +5,8 @@ let PDFDocument = require("pdfkit");
 
 const env = {
     extended: false,
+
+    debug:    false,
 }
 
 const color = {
@@ -113,8 +115,8 @@ cvl.forEach(l => {
                 let tags = l.split('==').map(t => t.trim())
                 cv.experience.jobs.push({
                     company: tags[0],
-                    position: tags[1],
-                    timeline: tags[2],
+                    position: tags[1] || '',
+                    timeline: tags[2] || '',
                     ls: [],
                 })
                 cv.experience.ijobs++
@@ -415,13 +417,22 @@ let curY = doc.y
 
 cv.experience.jobs.forEach(job => {
     // a job entry
+    if (env.debug) {
+        console.log('=== generating a job entry ===')
+        console.dir(job)
+    }
+
     doc.state.pageJump = false
     doc.state.baseY = doc.y
 
-    doc
-        .fontSize(cg.textSize+2)
-        .fillColor(color.blue)
-        .mdtext(job.company, baseX)
+    const clines = job.company.split('|')
+    clines.forEach(line => {
+        doc
+            .fontSize(cg.textSize+2)
+            .fillColor(color.blue)
+            .mdtext(line, baseX)
+    })
+
     doc
         .fontSize(cg.textSize)
         .fillColor(color.grey)
